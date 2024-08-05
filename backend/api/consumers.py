@@ -18,13 +18,11 @@ class LoadEmaiLetterDataConsumer(AsyncWebsocketConsumer):
             total_items = await self.get_total_items()
             chunk_size = 10
             total_chunks = (total_items // chunk_size) + (1 if total_items % chunk_size else 0)
-
             for chunk in range(total_chunks):
                 data = await self.get_chunk_data(chunk, chunk_size)
                 progress = ((chunk + 1) / total_chunks) * 100
-                print(json.dumps({'data': data, 'progress': progress}))
                 await self.send(text_data=json.dumps({'data': data, 'progress': progress},))
-                await asyncio.sleep(0.1)  # Задержка для имитации постепенной загрузки
+                await asyncio.sleep(0.2)  # Задержка для имитации постепенной загрузки
 
     @sync_to_async
     def get_total_items(self):
