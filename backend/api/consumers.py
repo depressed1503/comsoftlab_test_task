@@ -2,6 +2,7 @@ import json
 import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
 from .models import *
+from .serializers import *
 from asgiref.sync import sync_to_async
 
 
@@ -13,8 +14,7 @@ class LoadEmaiLetterDataConsumer(AsyncWebsocketConsumer):
         pass
 
     async def receive(self, text_data):
-        text_data_json = json.loads(text_data)
-        if text_data_json.get('start'):
+        if text_data == "start":
             total_items = await self.get_total_items()
             chunk_size = 10
             total_chunks = (total_items // chunk_size) + (1 if total_items % chunk_size else 0)
@@ -22,7 +22,8 @@ class LoadEmaiLetterDataConsumer(AsyncWebsocketConsumer):
             for chunk in range(total_chunks):
                 data = await self.get_chunk_data(chunk, chunk_size)
                 progress = ((chunk + 1) / total_chunks) * 100
-                await self.send(text_data=json.dumps({'data': data, 'progress': progress}))
+                print(json.dumps({'data': data, 'progress': progress}))
+                await self.send(text_data=json.dumps({'data': data, 'progress': progress},))
                 await asyncio.sleep(0.1)  # Задержка для имитации постепенной загрузки
 
     @sync_to_async
@@ -33,5 +34,5 @@ class LoadEmaiLetterDataConsumer(AsyncWebsocketConsumer):
     def get_chunk_data(self, chunk, chunk_size):
         start_index = chunk * chunk_size
         end_index = start_index + chunk_size
-        data = list(EmailLetter.objects.all()[start_index:end_index].values())
+        data = EmailLetterSerializer(EmailLetter.objects.all()[start_index:end_index], many=True).data
         return data
