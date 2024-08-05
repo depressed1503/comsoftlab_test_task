@@ -2,6 +2,7 @@ import './App.css'
 import { useEffect, useState, useRef } from "react"
 import Button from "react-bootstrap/Button"
 import Table from "react-bootstrap/Table"
+import ProgressBar from "react-bootstrap/ProgressBar"
 
 type CustomUser = {
   id: number;
@@ -32,6 +33,26 @@ function MessageComponent({ sender, topic, date_sent, date_received, text, files
       </td>
     </tr>
   );
+}
+
+function ProgressComponent({ progress }: { progress: number }) {
+  function getLabel() {
+    if (progress <= 0) {
+      return "Сообщения не получены"
+    }
+    else if (progress < 100) {
+      return "Получение сообщений"
+    }
+    else {
+      return "Сообщения получены"
+    }
+  }
+  return (
+      <>
+        <h5>{getLabel()}</h5>
+        <ProgressBar now={progress} label={`${progress}%`}/>
+      </>
+  )
 }
 
 export default function App() {
@@ -80,8 +101,8 @@ export default function App() {
 
   return (
     <>
-      <div>Progress: {progress}%</div>
-      <Button onClick={handleGetMessages}>Get Messages</Button>
+      <ProgressComponent progress={progress} />
+      <Button className={"my-3"} onClick={handleGetMessages}>Get Messages</Button>
       <Table responsive>
         <thead>
             <tr>

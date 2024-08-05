@@ -1,7 +1,6 @@
 import json
 import asyncio
 from channels.generic.websocket import AsyncWebsocketConsumer
-from .models import *
 from .serializers import *
 from asgiref.sync import sync_to_async
 
