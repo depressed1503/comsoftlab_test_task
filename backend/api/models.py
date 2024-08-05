@@ -15,5 +15,5 @@ class EmailLetter(models.Model):
 
 
 class EmailLetterFile(models.Model):
-    email_letter = models.ForeignKey(to='EmailLetter', on_delete=models.CASCADE)
+    email_letter = models.ForeignKey(to='EmailLetter', on_delete=models.CASCADE, related_name='files')
     file = models.FileField()

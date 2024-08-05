@@ -11,16 +11,24 @@ type CustomUser = {
   password: string;
 }
 
+type EmailLetterFile = {
+  email_letter: number;
+  file: string;
+
+}
+
 type EmailLetter = {
   sender: number;
   topic: string;
   date_sent: string;
   date_received: string;
   text: string;
-  files: string[];
+  files: EmailLetterFile[];
 }
 
+
 function MessageComponent({ sender, topic, date_sent, date_received, text, files }: EmailLetter) {
+  console.log("!!!", files)
   return (
     <tr>
       <td>{sender}</td>
@@ -29,7 +37,7 @@ function MessageComponent({ sender, topic, date_sent, date_received, text, files
       <td>{date_received}</td>
       <td>{text}</td>
       <td>
-        {files?.map(file => (<a href={file}>{file}</a>))}
+        {files?.map((file, index) => <a key={index} href={`http://127.0.0.1:8000${file.file}/`} download>{file.file}</a>)}
       </td>
     </tr>
   );
@@ -82,6 +90,7 @@ export default function App() {
     socket.current.onmessage = (event) => {
       try {
         const { data, progress } = JSON.parse(event.data)
+        console.log(data.files)
         setMessages(prevMessages => [...(progress === 100 ? prevMessages : []), ...data])
         setProgress(progress);
       } catch (error) {

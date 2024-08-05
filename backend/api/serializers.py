@@ -14,3 +14,7 @@ class EmailLetterSerializer(serializers.ModelSerializer):
     class Meta:
         model = EmailLetter
         fields = ('topic', 'date_sent', 'date_received', 'text', 'files', 'sender')
+
+    def to_representation(self, instance):
+        print(instance)
+        return super().to_representation(instance)

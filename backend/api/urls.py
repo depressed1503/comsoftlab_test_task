@@ -3,9 +3,11 @@ from rest_framework import routers
 from .views import *
 from .routing import websocket_urlpatterns
 
-email_letter_router = routers.SimpleRouter()
-email_letter_router.register(r'letters', EmailLetterViesSet)
+router = routers.SimpleRouter()
+router.register(r'letters', EmailLetterViesSet)
+router.register(r'files', EmailLetterFileViewSet)
+
 urlpatterns = [
-    path('email/', include(email_letter_router.urls)),
+    path('email/', include(router.urls)),
     path('auth/', include('rest_framework.urls'))
 ] + websocket_urlpatterns
