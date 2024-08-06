@@ -4,12 +4,12 @@ import Button from "react-bootstrap/Button"
 import Table from "react-bootstrap/Table"
 import ProgressBar from "react-bootstrap/ProgressBar"
 
-type CustomUser = {
-  id: number;
-  name: string;
-  email: string;
-  password: string;
-}
+// type CustomUser = {
+//   id: number;
+//   name: string;
+//   email: string;
+//   password: string;
+// }
 
 type EmailLetterFile = {
   email_letter: number;

@@ -5,4 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   optimizeDeps: { exclude: ['fsevents'] },
+  server: {
+    port: 3000,
+  }
 })
