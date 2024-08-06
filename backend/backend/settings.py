@@ -25,11 +25,30 @@ SECRET_KEY = 'django-insecure-+i1bw5xqjm^diw88ikm!-oj!se%vslu)ui00gnnh@_^te2!$dv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+]
 
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+]
 
-# Application definition
+CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+]
+
+CSRF_COOKIE_HTTPONLY = False
+
+AUTHENTICATION_BACKENDS = [
+    'api.auth_backends.CustomUserAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 INSTALLED_APPS = [
     'daphne',
     'django.contrib.admin',
@@ -43,8 +62,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'channels'
 ]
-
-CORS_ALLOW_ALL_ORIGINS = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -136,6 +153,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'api.CustomUser'
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',  # Change as needed
+    ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.BasicAuthentication',
     ],

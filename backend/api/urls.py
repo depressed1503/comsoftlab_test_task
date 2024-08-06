@@ -9,5 +9,7 @@ router.register(r'files', EmailLetterFileViewSet)
 
 urlpatterns = [
     path('email/', include(router.urls)),
-    path('auth/', include('rest_framework.urls'))
+    path('auth/login/', CustomLoginView.as_view()),
+    path('auth/user/', get_current_user),
+    path('csrf/', get_csrf_token),
 ] + websocket_urlpatterns
