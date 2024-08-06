@@ -1,8 +1,9 @@
 version: '3'
 
 services:
-  db:
-    image: postgres:13
+  pgdb:
+    image: postgres:latest
+    container_name: pgdb
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
@@ -11,7 +12,6 @@ services:
       - POSTGRES_PASSWORD=mypassword
     ports:
       - "5432:5432"
-    container_name: db
 
   back:
     build:
@@ -21,7 +21,14 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - db
+      - pgdb
+    environment:
+      DATABASE_NAME: mydatabase
+      DATABASE_USER: myuser
+      DATABASE_PASSWORD: mypassword
+      DATABASE_HOST: pgdb
+      DATABASE_PORT: 5432
+
   front:
     build:
       context: frontend
@@ -29,5 +36,6 @@ services:
     command: serve -s dist
     ports:
       - '3000:3000'
+
 volumes:
   postgres_data:
