@@ -17,6 +17,7 @@ services:
     build:
       context: backend
       dockerfile: Dockerfile
+    container_name: back
     command: python manage.py migrate && python manage.py runserver 0.0.0.0:8000
     ports:
       - "8000:8000"
@@ -33,6 +34,7 @@ services:
     build:
       context: frontend
       dockerfile: ./Dockerfile
+    container_name: front
     command: serve -s dist
     ports:
       - '3000:3000'
