@@ -4,6 +4,7 @@
 Описание: тестовое задание при устройстве на работу в команду "COMSOFTLAB".
 ## Запуск
 ```shell
+docker compose build
 docker compose up
 ```
 

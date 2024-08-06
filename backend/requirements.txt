@@ -6,3 +6,4 @@ pip
 setuptools
 sqlparse
 channels[daphne]
+psycopg2

@@ -9,6 +9,11 @@ services:
       - POSTGRES_DB=mydatabase
       - POSTGRES_USER=myuser
       - POSTGRES_PASSWORD=mypassword
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    container_name: db
 
   back:
     build:
@@ -19,6 +24,8 @@ services:
       - "8000:8000"
     depends_on:
       - db
+    networks:
+      - app-network
   front:
     build:
       context: frontend
@@ -26,5 +33,10 @@ services:
     command: serve -s dist
     ports:
       - '3000:3000'
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
 volumes:
   postgres_data:
