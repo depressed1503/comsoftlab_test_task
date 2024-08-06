@@ -190,6 +190,7 @@ export default function App() {
 
   return isAuthenticated ?  (
     <>
+      {userData && <h1>{userData?.id} - {userData?.email}</h1>}
       <Form>
         <Form.Control id={"topic_input"} placeholder={"Topic"} className={"mb-1"}></Form.Control>
         <Form.Control id={"text_input"} placeholder={"Text"} type={"text"} as={"textarea"} rows={3} className={"mb-1"}></Form.Control>

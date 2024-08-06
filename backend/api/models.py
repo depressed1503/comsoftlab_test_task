@@ -3,7 +3,9 @@ from django.contrib.auth.models import AbstractUser
 
 
 class CustomUser(AbstractUser):
-    pass
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = []
+    email = models.EmailField(unique=True)
 
 
 class EmailLetter(models.Model):
