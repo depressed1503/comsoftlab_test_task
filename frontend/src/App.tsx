@@ -81,7 +81,7 @@ export default function App() {
     fetchCsrf()
   }, [])
 
-  useEffect(() => {
+  function createWebsocket() {
     const url = "ws://127.0.0.1:8000/ws/email_letters/"
     socket.current = new WebSocket(url)
 
@@ -110,8 +110,11 @@ export default function App() {
         console.error("Error parsing WebSocket message:", error)
       }
     }
+  }
 
-  }, []);
+  useEffect(() => {
+    createWebsocket()
+  }, [userData]);
 
   const handleGetMessages = () => {
     if (socket.current) {
