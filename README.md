@@ -4,8 +4,7 @@
 Описание: тестовое задание при устройстве на работу в команду "COMSOFTLAB".
 ## Запуск
 ```shell
-docker compose build
-docker compose up
+docker compose up --build
 ```
 
 После запуска в окне браузера перейти на [страницу](https://127.0.0.1:3000/).

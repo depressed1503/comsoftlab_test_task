@@ -18,7 +18,9 @@ services:
       context: backend
       dockerfile: Dockerfile
     container_name: back
-    command: python manage.py migrate && python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     depends_on:
@@ -29,7 +31,6 @@ services:
       DATABASE_PASSWORD: mypassword
       DATABASE_HOST: pgdb
       DATABASE_PORT: 5432
-
   front:
     build:
       context: frontend
