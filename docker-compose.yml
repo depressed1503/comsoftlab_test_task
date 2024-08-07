@@ -20,6 +20,7 @@ services:
     container_name: back
     command: >
       sh -c "python manage.py migrate &&
+             echo \"from api.models import CustomUser; CustomUser.objects.create_superuser('admin@admin.com', 'admin@admin.com', 'admin') if not CustomUser.objects.filter(username='admin@admin.com').exists() else None\" | python manage.py shell &&
              python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
