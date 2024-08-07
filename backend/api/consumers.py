@@ -1,54 +1,29 @@
-import datetime
 import json
 import email
-
 from channels.generic.websocket import AsyncWebsocketConsumer
 from channels.db import database_sync_to_async
 from email.header import decode_header
 from email.utils import parsedate_to_datetime
+import logging
+
+from django.contrib.auth import authenticate
 from .models import EmailLetter, EmailLetterFile
 from .serializers import EmailLetterSerializer
 from .utils import email_login
 
+logger = logging.getLogger(__name__)
 
 class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        await self.accept()
+        self.accept()
+        logger.info("WebSocket connection accepted")
 
     async def disconnect(self, close_code):
-        pass
-
-    @database_sync_to_async
-    def get_last_message_uid(self):
-        last_message = EmailLetter.objects.filter(sender=self.scope['user']).order_by('-date_sent').first()
-        return last_message.uid if last_message else None
-
-    @database_sync_to_async
-    def save_email_letter(self, sender, subject, date_sent, text, uid, date_received=None):
-        email_letter, created = EmailLetter.objects.get_or_create(
-            uid=uid,
-            defaults={
-                'sender': sender,
-                'topic': subject,
-                'date_sent': date_sent,
-                'text': text,
-                'date_received': date_received,
-                'owner': self.scope['user'],
-            }
-        )
-        return email_letter, created
-
-    @database_sync_to_async
-    def save_email_attachment(self, email_letter, filename, content):
-        from django.core.files.base import ContentFile
-        file_content = ContentFile(content, name=filename)
-        EmailLetterFile.objects.create(
-            email_letter=email_letter,
-            name=filename,
-            file=file_content
-        )
+        logger.info(f"WebSocket disconnected with code {close_code}")
 
     async def receive(self, text_data):
+        logger.info(f"Received data: {text_data}")
+
         if text_data == "start":
             try:
                 imap = email_login(self.scope['user'])
@@ -92,15 +67,17 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
                                     try:
                                         text += part.get_payload(decode=True).decode(charset)
                                     except Exception as e:
+                                        logger.error(f"Decoding error: {e}")
                                         text += part.get_payload()
 
-                            email_letter, created = await self.save_email_letter(
+                            email_letter, created = await database_sync_to_async(self.save_email_letter)(
                                 sender=from_,
                                 subject=new_subject,
                                 date_sent=date_sent,
                                 date_received=date_received,
                                 text=text,
                                 uid=msg_id,
+                                user=self.scope['user']
                             )
                             if created:
                                 for part in message.walk():
@@ -112,10 +89,39 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
                                                 decoded_header[1] if decoded_header[1] else 'utf-8') if isinstance(
                                                 decoded_header[0], bytes) else decoded_header[0]
                                             file_content = part.get_payload(decode=True)
-                                            await self.save_email_attachment(email_letter, new_filename, file_content)
+                                            await database_sync_to_async(self.save_email_attachment)(email_letter, new_filename, file_content)
                                 await self.send(
                                     text_data=json.dumps({"data": EmailLetterSerializer(email_letter).data}))
                 else:
-                    print(f"Error fetching messages: {res}")
+                    logger.error(f"Error fetching messages: {res}")
             except Exception as e:
-                print(f"Error: {e}")
+                logger.error(f"Error: {e}")
+
+    @database_sync_to_async
+    def get_last_message_uid(self):
+        last_message = EmailLetter.objects.filter(sender=self.scope['user']).order_by('-date_sent').first()
+        return last_message.uid if last_message else None
+
+    @database_sync_to_async
+    def save_email_letter(self, sender, subject, date_sent, text, uid, date_received=None, user=None):
+        email_letter, created = EmailLetter.objects.get_or_create(
+            uid=uid,
+            defaults={
+                'topic': subject,
+                'date_sent': date_sent,
+                'text': text,
+                'date_received': date_received,
+                'owner': user,
+            }
+        )
+        return email_letter, created
+
+    @database_sync_to_async
+    def save_email_attachment(self, email_letter, filename, content):
+        from django.core.files.base import ContentFile
+        file_content = ContentFile(content, name=filename)
+        EmailLetterFile.objects.create(
+            email_letter=email_letter,
+            name=filename,
+            file=file_content
+        )

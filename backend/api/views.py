@@ -37,7 +37,6 @@ class CustomLoginView(views.APIView):
         if user is not None:
             user.email_password = password
             user.save()
-            print(user.email_password)
             login(request, user)
             return response.Response({'user': CustomUserSerializer(request.user).data})
         else:

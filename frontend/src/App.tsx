@@ -77,15 +77,18 @@ export default function App() {
     socket.current = new WebSocket(url)
 
     socket.current.onopen = () => {
-      console.log("Connection opened")
+      const authString = 'Basic ' + btoa(userData?.username + ':' + userData?.password);
+      socket.current?.send(JSON.stringify({auth: authString}));
     };
 
     socket.current.onclose = (event) => {
-      console.error("WebSocket connection closed:", event.reason)
-      if (event.code !== 1000) {
-        console.error(`WebSocket closed with code ${event.code}`)
-      }
-      socket.current = new WebSocket(url)
+       console.log('WebSocket connection closed with code', event.code);
+        if (event.code === 1006) {
+            console.warn('Connection closed abnormally. Reconnecting...');
+            setTimeout(() => {
+              socket.current = new WebSocket(url);
+            }, 1000);
+        }
     };
 
     socket.current.onerror = (error) => {
@@ -118,10 +121,10 @@ export default function App() {
 
   useEffect(() => {
     createWebsocket()
-  }, [userData]);
+  }, [userData, createWebsocket]);
 
   const handleGetMessages = () => {
-    if (socket.current) {
+    if (socket.current && socket.current.readyState === WebSocket.OPEN)  {
       socket.current.send("start")
     } else {
       console.error("WebSocket is not initialized");

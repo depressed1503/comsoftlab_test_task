@@ -17,14 +17,13 @@ def email_adress_to_imap_server(email_address):
 
 
 def email_login(user: CustomUser):
-    user_messsages = user.email_letters
     email_password = user.email_password
     username = user.email
     imap_server = email_adress_to_imap_server(username)
     try:
         imap = imaplib.IMAP4_SSL(imap_server)
         login_resp = imap.login(username, email_password)
-        if imap.select("INBOX")[0] == 'OK':
+        if imap.select("INBOX")[0] == 'OK' and login_resp[1] == 'OK':
             print("Successfully selected INBOX folder")
         return imap
     except imaplib.IMAP4.error as error:

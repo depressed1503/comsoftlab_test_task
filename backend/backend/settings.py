@@ -94,14 +94,14 @@ ASGI_APPLICATION = "backend.asgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("DATABASE_NAME"),
-        "USER": os.environ.get("DATABASE_USER"),
-        "PASSWORD": os.environ.get("DATABASE_PASSWORD"),
-        "HOST": os.environ.get("DATABASE_HOST"),
+        "NAME": os.environ.get("DATABASE_NAME", "mydatabase"),
+        "USER": os.environ.get("DATABASE_USER", "myuser"),
+        "PASSWORD": os.environ.get("DATABASE_PASSWORD", "mypassword"),
+        "HOST": os.environ.get("DATABASE_HOST", "localhost"),
         "PORT": os.environ.get("DATABASE_PORT", 5432),
     }
 }
-
+print(DATABASES)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
