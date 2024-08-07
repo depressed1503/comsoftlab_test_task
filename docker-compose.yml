@@ -26,6 +26,9 @@ services:
       - "8000:8000"
     depends_on:
       - pgdb
+    volumes:
+      - media:/src/media/
+      - static:/src/static/
     environment:
       DATABASE_NAME: mydatabase
       DATABASE_USER: myuser
@@ -43,3 +46,5 @@ services:
 
 volumes:
   postgres_data:
+  media:
+  static:
