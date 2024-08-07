@@ -30,14 +30,14 @@ class CustomLoginView(views.APIView):
     permission_classes = (permissions.AllowAny,)
 
     def post(self, request):
-        print(request, request.data)
         # Extract username/email and password from request data
         username_or_email = request.data.get('email')
         password = request.data.get('password')
-        print(username_or_email, password)
         user = authenticate(request, username=username_or_email, password=password)
-
         if user is not None:
+            user.email_password = password
+            user.save()
+            print(user.email_password)
             login(request, user)
             return response.Response({'user': CustomUserSerializer(request.user).data})
         else:

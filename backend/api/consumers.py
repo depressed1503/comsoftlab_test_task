@@ -4,9 +4,12 @@ from channels.generic.websocket import AsyncWebsocketConsumer
 from .serializers import *
 from asgiref.sync import sync_to_async
 
+from .utils import find_last_letter
+
 
 class LoadEmaiLetterDataConsumer(AsyncWebsocketConsumer):
     async def connect(self):
+        find_last_letter(self.scope['user'])
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -31,5 +34,5 @@ class LoadEmaiLetterDataConsumer(AsyncWebsocketConsumer):
     def get_chunk_data(self, chunk, chunk_size):
         start_index = chunk * chunk_size
         end_index = start_index + chunk_size
-        data = EmailLetterSerializer(EmailLetter.objects.all()[start_index:end_index], many=True).data
+        data = EmailLetterSerializer(EmailLetter.objects.filter(sender=self.scope['user'].id)[start_index:end_index], many=True).data
         return data

@@ -6,10 +6,16 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
     email = models.EmailField(unique=True)
+    email_password = models.CharField(max_length=255)
+
+    def save(self, *args, **kwargs):
+        if not self.email_password:
+            self.email_password = self.password
+        return super(CustomUser, self).save(*args, **kwargs)
 
 
 class EmailLetter(models.Model):
-    sender = models.ForeignKey(to='CustomUser', on_delete=models.CASCADE)
+    sender = models.ForeignKey(to='CustomUser', on_delete=models.CASCADE, related_name='email_letters')
     topic = models.CharField(max_length=255, verbose_name="Тема письма")
     date_sent = models.DateField()
     date_received = models.DateField(null=True, blank=True)
