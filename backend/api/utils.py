@@ -16,15 +16,16 @@ def email_adress_to_imap_server(email_address):
     return e_to_imap[email_address.split("@")[-1]]
 
 
-def find_last_letter(user: CustomUser):
+def email_login(user: CustomUser):
     user_messsages = user.email_letters
     email_password = user.email_password
     username = user.email
     imap_server = email_adress_to_imap_server(username)
     try:
         imap = imaplib.IMAP4_SSL(imap_server)
-        print(imap, email_adress_to_imap_server(username), username, email_password)
         login_resp = imap.login(username, email_password)
-        print("Login response:", login_resp)
+        if imap.select("INBOX")[0] == 'OK':
+            print("Successfully selected INBOX folder")
+        return imap
     except imaplib.IMAP4.error as error:
         print('Authentication failed', str(error))

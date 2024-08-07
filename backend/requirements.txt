@@ -8,3 +8,4 @@ sqlparse
 channels[daphne]
 psycopg2-binary
 bs4
+python-dateutil

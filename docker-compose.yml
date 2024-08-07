@@ -7,9 +7,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_DB=mydatabase
-      - POSTGRES_USER=myuser
-      - POSTGRES_PASSWORD=mypassword
+      POSTGRES_DB: mydatabase
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
     ports:
       - "5432:5432"
 
@@ -35,6 +35,7 @@ services:
       DATABASE_PASSWORD: mypassword
       DATABASE_HOST: pgdb
       DATABASE_PORT: 5432
+
   front:
     build:
       context: frontend

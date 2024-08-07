@@ -15,11 +15,13 @@ class CustomUser(AbstractUser):
 
 
 class EmailLetter(models.Model):
-    sender = models.ForeignKey(to='CustomUser', on_delete=models.CASCADE, related_name='email_letters')
+    owner = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='email_letters')
+    sender = models.EmailField(unique=False)
     topic = models.CharField(max_length=255, verbose_name="Тема письма")
     date_sent = models.DateField()
     date_received = models.DateField(null=True, blank=True)
     text = models.TextField(null=True, blank=True)
+    uid = models.CharField(max_length=255, null=True, blank=True, unique=True)
 
 
 class EmailLetterFile(models.Model):

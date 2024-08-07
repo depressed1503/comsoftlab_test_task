@@ -18,7 +18,7 @@ class EmailLetterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = EmailLetter
-        fields = ('id', 'topic', 'date_sent', 'date_received', 'text', 'files', 'sender')
+        fields = ('id', 'topic', 'date_sent', 'date_received', 'text', 'files', 'sender', 'owner')
 
 
 class CustomUserSerializer(serializers.ModelSerializer):
