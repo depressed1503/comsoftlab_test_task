@@ -49,7 +49,7 @@ function ProgressComponent({ progress, max, text }: { progress: number, max: num
   return (
     <>
       <h5>{text}</h5>
-      <ProgressBar now={(progress / max) * 100} label={`${Math.round((progress / max) * 100)}%`} />
+      <ProgressBar now={progress === -1 ? 100 :(progress / max) * 100} label={progress === -1 ? "100%" : `${Math.round((progress / max) * 100)}%`} />
     </>
   )
 }
@@ -58,7 +58,7 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [messages, setMessages] = useState<EmailLetter[]>([])
   const [progressBarText, setProgressBarText] = useState<string>("Сообщения не получены, нажмите кнопку")
-  const [progress, setProgress] = useState(0)
+  const [progress, setProgress] = useState(-1)
   const [progressMax, setProgressMax] = useState(1)
   const socket = useRef<WebSocket | null>(null)
   const [csrf, setCsrf] = useState<string>("")
@@ -97,11 +97,9 @@ export default function App() {
     socket.current.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
-        console.log("!!!", data)
         if (data.progress !== undefined && data.max !== undefined) {
-          setProgress(data.progress)
-          setProgressMax(data.max)
           setProgressBarText(`Идет чтение сообщений: ${data.progress}`)
+          setProgressMax(data.max)
         }
 
         if(data.data) {
@@ -110,7 +108,6 @@ export default function App() {
 
         if(data.reverse_progress !== undefined) {
           console.log("Reverse progress:", data.reverse_progress)
-          setProgressBarText("Идет получение сообщений")
           setProgress(data.reverse_progress)
         }
 

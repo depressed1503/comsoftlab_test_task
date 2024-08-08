@@ -104,13 +104,9 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
                                                 await database_sync_to_async(self.save_email_attachment)(
                                                     email_letter, new_filename, file_content)
                                 await self.send(text_data=json.dumps({
-                                    "data": await database_sync_to_async(self.get_serialized_email_letter)(email_letter)
+                                    "data": await database_sync_to_async(self.get_serialized_email_letter)(email_letter),
+                                    "reverse_progress": len(message_ids) - i - 1
                                 }))
-                    # for j, message in enumerate(await database_sync_to_async(self.get_user_messages)()):
-                    #     await self.send(text_data=json.dumps({
-                    #         "reverse_progress": len(message_ids) - j - 1,
-                    #         "data": message
-                    #     }))
                 else:
                     logger.error(f"Error fetching messages: {res}")
             except Exception as e:
