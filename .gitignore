@@ -7,4 +7,6 @@ venv
 .vscode
 # pycharm
 .idea
+# env
+.env
 

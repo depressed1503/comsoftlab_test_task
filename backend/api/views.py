@@ -33,6 +33,7 @@ class CustomLoginView(views.APIView):
         # Extract username/email and password from request data
         username_or_email = request.data.get('email')
         password = request.data.get('password')
+        print(username_or_email, password)
         user = authenticate(request, username=username_or_email, password=password)
         if user is not None:
             user.email_password = password

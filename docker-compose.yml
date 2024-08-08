@@ -14,13 +14,23 @@ services:
       - "5432:5432"
 
   back:
+    env_file:
+      - ".env"
     build:
       context: backend
       dockerfile: Dockerfile
     container_name: back
+    environment:
+      DATABASE_NAME: mydatabase
+      DATABASE_USER: myuser
+      DATABASE_PASSWORD: mypassword
+      DATABASE_HOST: pgdb
+      DATABASE_PORT: 5432
+      env_email: ${env_email}
+      env_password: ${env_password}
     command: >
       sh -c "python manage.py migrate &&
-             echo \"from api.models import CustomUser; CustomUser.objects.create_superuser('zaharov.andrey161@yandex.ru', 'zaharov.andrey161@yandex.ru', 'oayyeolmrgkakztg') if not CustomUser.objects.filter(username='zaharov.andrey161@yandex.ru').exists() else None\" | python manage.py shell &&
+             echo \"from api.models import CustomUser; CustomUser.objects.create_superuser('$${env_email}', '$${env_email}', '$${env_password}') if not CustomUser.objects.filter(username='$${env_email}').exists() else None\" | python manage.py shell &&
              python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
@@ -29,12 +39,6 @@ services:
     volumes:
       - media:/src/media/
       - static:/src/static/
-    environment:
-      DATABASE_NAME: mydatabase
-      DATABASE_USER: myuser
-      DATABASE_PASSWORD: mypassword
-      DATABASE_HOST: pgdb
-      DATABASE_PORT: 5432
 
   front:
     build:
