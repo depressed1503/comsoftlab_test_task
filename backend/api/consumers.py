@@ -13,9 +13,10 @@ from .utils import email_login
 
 logger = logging.getLogger(__name__)
 
+
 class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.accept()
+        await self.accept()
         logger.info("WebSocket connection accepted")
 
     async def disconnect(self, close_code):
@@ -32,6 +33,7 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
 
                 if res == 'OK':
                     message_ids = messages[0].split()
+                    print(message_ids)
                     if last_uid:
                         start_index = message_ids.index(last_uid.encode()) + 1
                         message_ids = message_ids[start_index:]
@@ -69,7 +71,7 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
                                     except Exception as e:
                                         logger.error(f"Decoding error: {e}")
                                         text += part.get_payload()
-
+                            print(from_, new_subject, date_sent, date_received, text, msg_id, self.scope['user'])
                             email_letter, created = await database_sync_to_async(self.save_email_letter)(
                                 sender=from_,
                                 subject=new_subject,

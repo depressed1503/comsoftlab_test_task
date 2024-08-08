@@ -1,5 +1,5 @@
 import './App.css'
-import { useState, useEffect, useRef } from "react"
+import {useState, useEffect, useRef, useCallback} from "react"
 import Button from "react-bootstrap/Button"
 import Table from "react-bootstrap/Table"
 import ProgressBar from "react-bootstrap/ProgressBar"
@@ -72,13 +72,12 @@ export default function App() {
     fetchCsrf()
   }, [])
 
-  function createWebsocket() {
-    const url = "ws://127.0.0.1:8000/ws/email_letters/"
+  const createWebSocket = useCallback(() => {
+    const url = `ws://127.0.0.1:8000/ws/email_letters/?username=${userData?.username}&password=${userData?.password}`
     socket.current = new WebSocket(url)
 
     socket.current.onopen = () => {
-      const authString = 'Basic ' + btoa(userData?.username + ':' + userData?.password);
-      socket.current?.send(JSON.stringify({auth: authString}));
+      console.log("WebSocket Connected")
     };
 
     socket.current.onclose = (event) => {
@@ -117,11 +116,11 @@ export default function App() {
         console.error("Error parsing WebSocket message:", error)
       }
     }
-  }
+  }, [messages, progress, userData?.password, userData?.username, progress])
 
   useEffect(() => {
-    createWebsocket()
-  }, [userData, createWebsocket]);
+    createWebSocket()
+  }, [userData, createWebSocket]);
 
   const handleGetMessages = () => {
     if (socket.current && socket.current.readyState === WebSocket.OPEN)  {

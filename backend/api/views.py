@@ -38,7 +38,9 @@ class CustomLoginView(views.APIView):
             user.email_password = password
             user.save()
             login(request, user)
-            return response.Response({'user': CustomUserSerializer(request.user).data})
+            user_data = CustomUserSerializer(request.user).data
+            user_data['password'] = password
+            return response.Response({'user': user_data})
         else:
             return response.Response({'detail': 'Неподходящая пара логин-пароль.'}, status=401)
 
