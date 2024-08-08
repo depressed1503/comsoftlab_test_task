@@ -105,6 +105,7 @@ export default function App() {
 
         if(data.data !== undefined) {
           setMessages(messages => [...messages, data.data].filter((value, index, array) => array.indexOf(value) === index))
+          console.log(messages)
         }
 
         if(data.reverse_progress !== undefined) {
@@ -126,6 +127,8 @@ export default function App() {
   const handleGetMessages = () => {
     if (socket.current && socket.current.readyState === WebSocket.OPEN)  {
       socket.current.send("start")
+      setMessages([])
+      setProgress(progressMax)
     } else {
       console.error("WebSocket is not initialized");
     }
