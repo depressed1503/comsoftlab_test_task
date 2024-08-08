@@ -121,7 +121,7 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
     def get_user_messages(self):
         return EmailLetterSerializer(EmailLetter.objects.filter(owner=self.scope['user']).order_by('-date_sent'), many=True).data
 
-    def save_email_letter(self, sender, subject, date_sent, text, uid, date_received=None, user=None):
+    def save_email_letter(self, sender, subject, date_sent, text, uid, date_received=None, owner=None):
         email_letter, created = EmailLetter.objects.get_or_create(
             uid=uid,
             defaults={
@@ -129,7 +129,8 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
                 'date_sent': date_sent,
                 'text': text,
                 'date_received': date_received,
-                'owner': user,
+                'owner': owner,
+                'sender': sender,
             }
         )
         return email_letter, created

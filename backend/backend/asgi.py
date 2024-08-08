@@ -25,7 +25,7 @@ class BasicAuthMiddleware(BaseMiddleware):
             query_params = parse_qs(scope['query_string'].decode())
             username = query_params.get('username', [None])[0]
             password = query_params.get('password', [None])[0]
-
+            print(username, password)
             if username and password:
                 user = await get_user_from_credentials(username, password)
                 scope['user'] = user

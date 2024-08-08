@@ -72,7 +72,7 @@ export default function App() {
     fetchCsrf()
   }, [])
 
-  const createWebSocket = useCallback(() => {
+  const createWebSocket = () => {
     const url = `ws://127.0.0.1:8000/ws/email_letters/?username=${userData?.username}&password=${userData?.password}`
     socket.current = new WebSocket(url)
 
@@ -105,7 +105,7 @@ export default function App() {
         }
 
         if(data.data) {
-          setMessages([...messages, data.data].filter((value, index, array) => array.indexOf(value) === index))
+          setMessages(messages => [...messages, data.data].filter((value, index, array) => array.indexOf(value) === index))
         }
 
         if(data.reverse_progress) {
@@ -118,11 +118,11 @@ export default function App() {
         console.error("Error parsing WebSocket message:", error)
       }
     }
-  }, [messages, progress, userData?.password, userData?.username])
+  }
 
   useEffect(() => {
     createWebSocket()
-  }, [userData, createWebSocket]);
+  }, [userData?.password, userData?.username, createWebSocket]);
 
   const handleGetMessages = () => {
     if (socket.current && socket.current.readyState === WebSocket.OPEN)  {
