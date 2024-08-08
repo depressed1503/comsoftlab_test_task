@@ -23,7 +23,8 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
         logger.info(f"WebSocket disconnected with code {close_code}")
 
     def get_all_messages_uids(self):
-        return EmailLetter.objects.filter(user=self.scope['user']).values_list('uid', flat=True)
+        return EmailLetter.objects.filter(owner=self.scope['user']).values_list('uid', flat=True)
+
     async def receive(self, text_data):
         logger.info(f"Received data: {text_data}")
 
@@ -85,7 +86,7 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
                                     date_received=date_received,
                                     text=text,
                                     uid=msg_id,
-                                    user=self.scope['user']
+                                    owner=self.scope['user']
                                 )
                                 if created:
                                     for part in message.walk():
