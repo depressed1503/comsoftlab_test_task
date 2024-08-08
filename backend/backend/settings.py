@@ -14,7 +14,7 @@ from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+os.environ["DJANGO_ALLOW_ASYNC_UNSAFE"] = "true"
 SECRET_KEY = 'django-insecure-+i1bw5xqjm^diw88ikm!-oj!se%vslu)ui00gnnh@_^te2!$dv'
 
 DEBUG = True

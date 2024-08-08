@@ -15,6 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
+    def get_serialized_email_letter(self, email_letter: EmailLetter):
+        return EmailLetterSerializer(email_letter).data
+
     async def connect(self):
         await self.accept()
         logger.info("WebSocket connection accepted")
@@ -100,19 +103,19 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
                                                 file_content = part.get_payload(decode=True)
                                                 await database_sync_to_async(self.save_email_attachment)(
                                                     email_letter, new_filename, file_content)
-                    for j, message in enumerate(await database_sync_to_async(self.get_user_messages)()):
-                        await self.send(text_data=json.dumps({
-                            "reverse_progress": len(message_ids) - j - 1,
-                            "data": message
-                        }))
+                                await self.send(text_data=json.dumps({
+                                    "data": await database_sync_to_async(self.get_serialized_email_letter)(email_letter)
+                                }))
+                    # for j, message in enumerate(await database_sync_to_async(self.get_user_messages)()):
+                    #     await self.send(text_data=json.dumps({
+                    #         "reverse_progress": len(message_ids) - j - 1,
+                    #         "data": message
+                    #     }))
                 else:
                     logger.error(f"Error fetching messages: {res}")
             except Exception as e:
                 logger.error(f"Error: {e}")
 
-
-    def get_serialized_email_letter(self, email_letter: EmailLetter):
-        return EmailLetterSerializer(email_letter).data
 
     def get_last_message_uid(self):
         last_message = EmailLetter.objects.filter(owner=self.scope['user']).order_by('-date_sent').first()

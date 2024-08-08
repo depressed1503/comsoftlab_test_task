@@ -72,7 +72,7 @@ export default function App() {
     fetchCsrf()
   }, [])
 
-  const createWebSocket = () => {
+  const createWebSocket = useCallback(() => {
     const url = `ws://127.0.0.1:8000/ws/email_letters/?username=${userData?.username}&password=${userData?.password}`
     socket.current = new WebSocket(url)
 
@@ -108,7 +108,7 @@ export default function App() {
           setMessages(messages => [...messages, data.data].filter((value, index, array) => array.indexOf(value) === index))
         }
 
-        if(data.reverse_progress) {
+        if(data.reverse_progress !== undefined) {
           console.log("Reverse progress:", data.reverse_progress)
           setProgressBarText("Идет получение сообщений")
           setProgress(data.reverse_progress)
@@ -118,11 +118,12 @@ export default function App() {
         console.error("Error parsing WebSocket message:", error)
       }
     }
-  }
+  }, [userData, messages, progress, setMessages])
 
   useEffect(() => {
+    console.log("!!!", userData?.username, userData?.password)
     createWebSocket()
-  }, [userData?.password, userData?.username, createWebSocket]);
+  }, [userData, createWebSocket, messages]);
 
   const handleGetMessages = () => {
     if (socket.current && socket.current.readyState === WebSocket.OPEN)  {
@@ -161,7 +162,6 @@ export default function App() {
       if (response.status === 200) {
         setIsAuthenticated(true)
         setUserData(data.user)
-        console.log(data)
       }
     } catch (error) {
       console.error('There was a problem with your fetch operation:', error);
