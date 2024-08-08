@@ -35,7 +35,7 @@ function MessageComponent({ sender, topic, date_sent, date_received, text, files
       <td>{topic}</td>
       <td>{date_sent}</td>
       <td>{date_received}</td>
-      <td>{text}</td>
+      <td>{text.slice(0, 100)}</td>
       <td>
         {files?.map((file, index) => (
           <a key={index} href={`http://127.0.0.1:8000${file.file}/`} download>{file.name}</a>
@@ -97,17 +97,19 @@ export default function App() {
     socket.current.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
+        console.log(data)
         if (data.progress !== undefined && data.max !== undefined) {
-          setProgressBarText(`Идет чтение сообщений: ${data.progress}`)
+          setProgressBarText(`Идет чтение сообщений: ${data.progress + 1}`)
           setProgressMax(data.max)
         }
 
-        if(data.data) {
+        if(data.data !== undefined) {
           setMessages(messages => [...messages, data.data].filter((value, index, array) => array.indexOf(value) === index))
         }
 
         if(data.reverse_progress !== undefined) {
           console.log("Reverse progress:", data.reverse_progress)
+          setProgressBarText(`Идет получение сообщений ${data.reverse_progress}`)
           setProgress(data.reverse_progress)
         }
 
@@ -118,7 +120,6 @@ export default function App() {
   }, [userData, messages, progress, setMessages])
 
   useEffect(() => {
-    console.log("!!!", userData?.username, userData?.password)
     createWebSocket()
   }, [userData, createWebSocket, messages]);
 
