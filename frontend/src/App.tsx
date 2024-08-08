@@ -118,7 +118,7 @@ export default function App() {
         console.error("Error parsing WebSocket message:", error)
       }
     }
-  }, [messages, progress, userData?.password, userData?.username, progress])
+  })
 
   useEffect(() => {
     createWebSocket()
