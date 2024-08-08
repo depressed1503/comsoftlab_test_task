@@ -28,7 +28,7 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
         if text_data == "start":
             try:
                 imap = email_login(self.scope['user'])
-                last_uid = await self.get_last_message_uid()
+                last_uid = await database_sync_to_async(self.get_last_message_uid)()
                 res, messages = imap.uid("search", "ALL")
 
                 if res == 'OK':
@@ -99,12 +99,10 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
             except Exception as e:
                 logger.error(f"Error: {e}")
 
-    @database_sync_to_async
     def get_last_message_uid(self):
         last_message = EmailLetter.objects.filter(sender=self.scope['user']).order_by('-date_sent').first()
         return last_message.uid if last_message else None
 
-    @database_sync_to_async
     def save_email_letter(self, sender, subject, date_sent, text, uid, date_received=None, user=None):
         email_letter, created = EmailLetter.objects.get_or_create(
             uid=uid,
@@ -118,7 +116,6 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
         )
         return email_letter, created
 
-    @database_sync_to_async
     def save_email_attachment(self, email_letter, filename, content):
         from django.core.files.base import ContentFile
         file_content = ContentFile(content, name=filename)
