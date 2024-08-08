@@ -97,19 +97,21 @@ export default function App() {
     socket.current.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data)
-
+        console.log("!!!", data)
         if (data.progress !== undefined && data.max !== undefined) {
           setProgress(data.progress)
           setProgressMax(data.max)
           setProgressBarText(`Идет чтение сообщений: ${data.progress}`)
         }
 
-        if (data.status === "complete") {
-          setProgressBarText("Загрузка сообщений завершена")
+        if(data.data) {
+          setMessages([...messages, data.data].filter((value, index, array) => array.indexOf(value) === index))
         }
 
-        if(data.data) {
-          setMessages([...messages, data.data])
+        if(data.reverse_progress) {
+          console.log("Reverse progress:", data.reverse_progress)
+          setProgressBarText("Идет получение сообщений")
+          setProgress(data.reverse_progress)
         }
 
       } catch (error) {

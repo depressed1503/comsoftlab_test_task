@@ -35,7 +35,10 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
                     message_ids = messages[0].split()
                     print(message_ids)
                     if last_uid:
-                        start_index = message_ids.index(last_uid.encode()) + 1
+                        try:
+                            start_index = message_ids.index(last_uid.encode()) + 1
+                        except ValueError:
+                            start_index = 0
                         message_ids = message_ids[start_index:]
                     else:
                         start_index = 0
@@ -91,17 +94,28 @@ class LoadEmailLetterDataConsumer(AsyncWebsocketConsumer):
                                                 decoded_header[1] if decoded_header[1] else 'utf-8') if isinstance(
                                                 decoded_header[0], bytes) else decoded_header[0]
                                             file_content = part.get_payload(decode=True)
-                                            await database_sync_to_async(self.save_email_attachment)(email_letter, new_filename, file_content)
-                                await self.send(
-                                    text_data=json.dumps({"data": EmailLetterSerializer(email_letter).data}))
+                                            await database_sync_to_async(self.save_email_attachment)(
+                                                email_letter, new_filename, file_content)
+
+                    for j, message in enumerate(await database_sync_to_async(self.get_user_messages)()):
+                        await self.send(text_data=json.dumps({
+                            "reverse_progress": len(message_ids) - j - 1,
+                            "data": message
+                        }))
                 else:
                     logger.error(f"Error fetching messages: {res}")
             except Exception as e:
                 logger.error(f"Error: {e}")
 
+    def get_serialized_email_letter(self, email_letter: EmailLetter):
+        return EmailLetterSerializer(email_letter).data
+
     def get_last_message_uid(self):
-        last_message = EmailLetter.objects.filter(sender=self.scope['user']).order_by('-date_sent').first()
+        last_message = EmailLetter.objects.filter(owner=self.scope['user']).order_by('-date_sent').first()
         return last_message.uid if last_message else None
+
+    def get_user_messages(self):
+        return EmailLetterSerializer(EmailLetter.objects.filter(owner=self.scope['user']).order_by('-date_sent'), many=True).data
 
     def save_email_letter(self, sender, subject, date_sent, text, uid, date_received=None, user=None):
         email_letter, created = EmailLetter.objects.get_or_create(
