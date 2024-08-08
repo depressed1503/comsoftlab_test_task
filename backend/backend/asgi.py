@@ -29,6 +29,7 @@ class BasicAuthMiddleware(BaseMiddleware):
             if username and password:
                 user = await get_user_from_credentials(username, password)
                 scope['user'] = user
+                print(username, password, user)
 
         return await super().__call__(scope, receive, send)
 
